@@ -1,4 +1,4 @@
-(function () {
+(function () {  //(1) setInterval/setTimeout
     var a = 0;
     var intervalId = null;
     var inner = function () {
@@ -10,7 +10,7 @@
     intervalId = setInterval(inner, 1000);
 })();
 
-(function () {
+(function () {  //(2) evenListner
     var count = 0;
     var button = document.createElement('button');
     button.innerText = 'click';
