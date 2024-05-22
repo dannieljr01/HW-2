@@ -240,6 +240,53 @@ addCoffee('에스프레소')()
     .then(addCoffee('카페라떼'));
 ```
 위의 예제는 예제4-14의 반복적인 내용을 함수화해서 더 짧게 표현함.
+### 예제4-16(비동기 작업의 동기적 표현(3) - Generator)
+```
+var addCoffee = function (prevName, name){
+    setTimeout(function(){
+        coffeeMaker.next(prevName ? prevName + ', ' + name : name); 
+    }, 500);
+};
+var coffeeGenerator = function* (){
+    var espresso = yield addCoffee('','에스프레소');
+    console.log(espresso);
+    var americano = yield addCoffee(espresso, '아메리카노');
+    console.log(americano);
+    var mocha = yield addCoffee(americano, '카페모카');
+    console.log(mocha);
+    var latte = yield addCoffee(mocha, '카페라떼');
+    console.log(latte);
+};
+var coffeeMaker = coffeeGenerator();
+coffeeMaker.next();
+```
+ES6의 Generator를 이용함. Generator 함수를 실행하면 Iterator가 반환됨. Iterator는 next라는 메서드를 가지고 있음. 이 next 메서드를 호출하면 Generator 함수 내부에서 가장 먼저 등장하는 yield에서 함수의 실행을 멈춤. 이후 다시 next 메서드를 호출하면 앞서 멈췄던 부분부터 시작해서 그다음에 등장하는 yield에서 함수의 실행을 멈춤.
+### 예제4-17(비동기 작업의 동기적 표현(4) - Promise + Async/await)
+```
+var addCoffee = function (name) {
+    return new Promise(function (resolve) {
+        setTimeout(function (){
+            resolve(name);
+        }, 500);
+    });
+};
+var coffeeMaker = async function () {
+    var coffeeList = '';
+    var _addCoffee = async function (name) {
+        coffeeList += (coffeeList ? ',' : '') + await addCoffee(name);
+    };
+    await _addCoffee('에스프레소');
+    console.log(coffeeList);
+    await _addCoffee('아메리카노');
+    console.log(coffeeList);
+    await _addCoffee('카페모카');
+    console.log(coffeeList);
+    await _addCoffee('카페라떼');
+    console.log(coffeeList);
+};
+coffeeMaker();
+```
+ES2017에서는 가동성이 뛰어나고 작성법도 간단한 새로운 기능인 async/await가 추가됨. 비동기 작업을 수행하고자 하는 함수 앞에 async를 표기하고, 함수 내부에서 실질적인 비동기 작업이 필요한 위치마다 await를 표기하는 것만으로 뒤의 내용을 Promise로 자동 전환하고, 해당 내용이 resolve된 이후에야 다음으로 진행함. 즉 Promise의 then과 흡사한 효과를 얻을 수 있음.
 
 
 
